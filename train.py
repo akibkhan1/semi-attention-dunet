@@ -37,8 +37,8 @@ def parse_data(x, y):
         return x, y
 
     x, y = tf.numpy_function(_parse, [x, y], [tf.float32, tf.float32])
-    x.set_shape([384, 512, 3])
-    y.set_shape([384, 512, 2])
+    x.set_shape([256, 256, 3])
+    y.set_shape([256, 256, 2])
     return x, y
 
 def tf_dataset(x, y, batch=8):
@@ -69,10 +69,10 @@ if __name__ == "__main__":
     valid_y = sorted(glob(os.path.join(valid_path, "mask", "*.jpg")))
 
     model_path = "files/model.h5"
-    batch_size = 8
+    batch_size = 16
     epochs = 30
     lr = 1e-4
-    shape = (384, 512, 3)
+    shape = (256, 256, 3)
 
     model = build_model(shape)
     metrics = [
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     train_dataset = tf_dataset(train_x, train_y, batch=batch_size)
     valid_dataset = tf_dataset(valid_x, valid_y, batch=batch_size)
     # model = load_model_weight(sys.argv[1])
-    model.compile(loss=dice_loss, optimizer=Adam(lr), metrics=metrics)
+    model.compile(loss=dice_loss, optimizer=Nadam(lr), metrics=metrics)
 
     callbacks = [
         ModelCheckpoint(model_path,monitor='val_loss', verbose=2, 
